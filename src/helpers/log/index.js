@@ -5,5 +5,9 @@ module.exports.error = function(args){
 }
 
 module.exports.info = function(args){
-    console.error(clc.yellow("Info"), args);
+    console.info(clc.yellow("Info"), args);
+}
+
+module.exports.success = function(args){
+    console.log(clc.green("Success"), args);
 }

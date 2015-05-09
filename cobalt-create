@@ -4,6 +4,7 @@ var program = require('commander');
 var config = require("./src/config");
 var log = require("./src/helpers/log");
 var Q = require('q');
+require('q-foreach')(Q);
 var fs = require('fs');
 var prompt = require('prompt');
 
@@ -68,7 +69,7 @@ var gitCloneCobalt = function () {
         if (err) {
             deferred.reject("cannot clone the repository at " + gitHubPath);
         } else {
-            log.info("repository " + gitHubPath + " cloned");
+            log.success("repository " + gitHubPath + " cloned");
             deferred.resolve();
         }
     });
@@ -80,16 +81,15 @@ var gitCloneTemplate = function (platform) {
 
     deferred = Q.defer();
 
-    gitHubPath = config.gitHub + commands.templateName + '-' + platform + '.git';
+    gitHubPath = config.gitHub + 'Samples-' + commands.templateName + '-' + platform + '.git';
     log.info("cloning " + gitHubPath);
 
     Repository.clone(gitHubPath,
         commands.appName + '/' + platform, function (err, repo) {
             if (err) {
-                console.log(err)
                 deferred.reject("cannot clone the repository at " + gitHubPath);
             } else {
-                log.info("repository " + gitHubPath + " cloned");
+                log.success("repository " + gitHubPath + " cloned");
                 deferred.resolve();
             }
         });
@@ -97,13 +97,36 @@ var gitCloneTemplate = function (platform) {
     return deferred.promise;
 };
 
+var renameTemplate = function (platform) {
+    var rename = require('./src/helpers/rename');
+    deferred = Q.defer();
+
+    if (platform == 'ios') return rename.iosProject(commands.appName + '/' + platform, commands.templateName, commands.appName);
+    deferred.resolve();
+    return deferred.promise;
+};
+
+var promises = [];
+
 askPlatforms()
     .then(createPath)
     .then(gitCloneCobalt)
     .then(function () {
-        commands.platforms.forEach(function (platform) {
-            return gitCloneTemplate(platform)
-        });
+        return commands.platforms.reduce(function (previous, job) {
+            return previous.then(function () {
+                return gitCloneTemplate(job);
+            });
+        }, Q());
+    })
+    .then(function(){
+        return commands.platforms.reduce(function (previous, job) {
+            return previous.then(function () {
+                return renameTemplate(job);
+            });
+        }, Q());
+    })
+    .then(function(){
+        log.success("Finished");
     })
     .fail(function (err) {
         log.error(err);
