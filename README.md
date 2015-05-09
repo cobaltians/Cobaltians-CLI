@@ -6,29 +6,25 @@ future is coming.
 
 ## Cobalt CLI Installation
 
-    npm install cobalt -g
+    npm install cobalt-cli -g
 
 Using the -g flag installs the package globally, so it can be used in any project. Use sudo if needed.
 
 ## Create project from the command line
 
+Choose an app name and a base template
+
     cobalt create MyApp HelloWorld
-    
-    or 
+
+or
     
     cobalt create MyApp Catalog
     
-This command will ask for your reverse-style package name "com.example.myApp"
-    
-All subsequent commands need to be run within the project's directory, or any subdirectories within its scope:
+This will create a MyApp directory and asks if you want to build the corresponding Android and iOS projects.
+All subsequent commands need to be run within the project's directory, or any subdirectories within its scope.
 
     cd myAppName
 
-## Enable platforms
-
-    cobalt platform add "iOS"
-    cobalt platform add "Android"
-    
   
 ## Add Cobalt plugins
 
@@ -38,6 +34,7 @@ All subsequent commands need to be run within the project's directory, or any su
   
 
 ## Add Cobalt to an existing iOS or Android app
+
     
-    cobalt ....
+    cobalt invade ;)
 
