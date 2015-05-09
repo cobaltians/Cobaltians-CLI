@@ -18,8 +18,8 @@ module.exports.iosProject = function (path, templateName, appName) {
     });
 
     replace({
-        regex: "com.cobaltians",
-        replacement: "com",
+        regex: "com."+templateName,
+        replacement: "com."+appName,
         paths: [path],
         recursive: true,
         silent: true
@@ -41,15 +41,64 @@ module.exports.iosProject = function (path, templateName, appName) {
     try {
         //Catalog - Info.plist
         fs.renameSync(path + '/' + appName + '/' + templateName + "-Info.plist", path + '/' + appName + '/' + appName + "-Info.plist");
-    } catch (e) {}
+    } catch (e) {
+    }
 
     try {
         fs.renameSync(path + '/' + templateName + 'Tests', path + '/' + appName + 'Tests');
-    } catch (e) {}
+    } catch (e) {
+    }
 
     try {
         //mv appName/myAppTests/HelloWorldTests.m appName/myAppTests/myAppTests.m
         fs.renameSync(path + '/' + appName + 'Tests' + '/' + templateName + 'Tests.m',
             path + '/' + appName + 'Tests' + '/' + appName + 'Tests.m');
-    } catch (e) {}
+    } catch (e) {
+    }
+};
+
+module.exports.androidProject = function (path, templateName, appName) {
+
+    var replace = require("replace");
+
+    //First, let's replace occurences in files
+    replace({
+        regex: templateName,
+        replacement: appName,
+        paths: [path],
+        recursive: true,
+        silent: true
+    });
+
+    replace({
+        regex: "com.cobaltians." + templateName.toLowerCase(),
+        replacement: "com",
+        paths: [path],
+        recursive: true,
+        silent: true
+    });
+
+    replace({
+        regex: "com." + appName.toLowerCase(),
+        replacement: "com",
+        paths: [path],
+        recursive: true,
+        silent: true
+    });
+
+    fs.renameSync(path + '/' + templateName, path + '/' + appName);
+
+    fs.renameSync(path + '/' + appName + '/src/main/java/com/cobaltians/' + templateName.toLowerCase(),
+        path + '/' + appName + '/src/main/java/com/' + appName.toLowerCase());
+
+    fs.renameSync(path + '/' + appName + '/src/main/java/com/' + appName + '/' + templateName + 'Application.java',
+        path + '/' + appName + '/src/main/java/com/' + appName + 'Application.java');
+
+    replace({
+        regex: templateName + 'Application.java',
+        replacement: appName + 'Application.java',
+        paths: [path],
+        recursive: true,
+        silent: true
+    });
 };

@@ -99,6 +99,7 @@ var renameTemplate = function (platform) {
     deferred = Q.defer();
 
     if (platform == 'ios') return rename.iosProject(commands.appName + '/' + platform, commands.templateName, commands.appName);
+    if (platform == 'ios') return rename.androidProject(commands.appName + '/' + platform, commands.templateName, commands.appName);
     deferred.resolve();
     return deferred.promise;
 };
