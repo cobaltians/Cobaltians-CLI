@@ -32,10 +32,9 @@ if (!program.args[1]) {
 
 var askPlatforms = function () {
     deferred = Q.defer();
-
-    prompt = require('sync-prompt').prompt;
-    ios = prompt('Would you like to create an iOS app y/n  (default: y)');
-    android = prompt('Would you like to create an Android app y/n  (default: y)');
+    var readlineSync = require('readline-sync');
+    ios = readlineSync.question('Would you like to create an iOS app y/n  (default: y): ');
+    android = readlineSync.question('Would you like to create an Android app y/n  (default: y): ');
 
     if (ios == 'n') delete commands.platforms['ios'];
     if (android == 'n') delete commands.platforms['android'];
