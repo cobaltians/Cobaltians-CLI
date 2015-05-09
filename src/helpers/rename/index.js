@@ -41,11 +41,15 @@ module.exports.iosProject = function (path, templateName, appName) {
     try {
         //Catalog - Info.plist
         fs.renameSync(path + '/' + appName + '/' + templateName + "-Info.plist", path + '/' + appName + '/' + appName + "-Info.plist");
-        fs.renameSync(path + '/' + templateName + 'Tests', path + '/' + appName + 'Tests');
+    } catch (e) {}
 
+    try {
+        fs.renameSync(path + '/' + templateName + 'Tests', path + '/' + appName + 'Tests');
+    } catch (e) {}
+
+    try {
         //mv appName/myAppTests/HelloWorldTests.m appName/myAppTests/myAppTests.m
         fs.renameSync(path + '/' + appName + 'Tests' + '/' + templateName + 'Tests.m',
             path + '/' + appName + 'Tests' + '/' + appName + 'Tests.m');
-    } catch (e) {
-    }
+    } catch (e) {}
 };
