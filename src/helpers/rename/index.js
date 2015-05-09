@@ -18,8 +18,8 @@ module.exports.iosProject = function (path, templateName, appName) {
     });
 
     replace({
-        regex: "com."+templateName,
-        replacement: "com."+appName,
+        regex: "com." + templateName,
+        replacement: "com." + appName,
         paths: [path],
         recursive: true,
         silent: true
@@ -72,15 +72,7 @@ module.exports.androidProject = function (path, templateName, appName) {
 
     replace({
         regex: "com.cobaltians." + templateName.toLowerCase(),
-        replacement: "com",
-        paths: [path],
-        recursive: true,
-        silent: true
-    });
-
-    replace({
-        regex: "com." + appName.toLowerCase(),
-        replacement: "com",
+        replacement: "com." + appName.toLowerCase(),
         paths: [path],
         recursive: true,
         silent: true
