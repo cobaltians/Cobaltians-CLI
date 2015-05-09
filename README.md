@@ -4,7 +4,7 @@ Cobalt-CLI is a node.js command line to build Android and iOS Cobalt projects fr
 
 ## Cobalt CLI Installation
 
-    npm install cobalt-cli -g
+    npm install cobalt -g
 
 Using the -g flag installs the package globally, so it can be used in any project. Use sudo if needed.
 
