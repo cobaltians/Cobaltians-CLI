@@ -4,7 +4,6 @@ var program = require('commander');
 var config = require("./src/config");
 var log = require("./src/helpers/log");
 var Q = require('q');
-require('q-foreach')(Q);
 var fs = require('fs');
 
 var commands = {
