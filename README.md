@@ -24,7 +24,16 @@ Using the -g flag installs the package globally, so it can be used in any projec
 
     cobalt create "MyAppName" "templateName"
     
-  /*  will ask for "com.example.myApp" */
+This command will ask for your reverse-style package name "com.example.myApp"
+    
+All subsequent commands need to be run within the project's directory, or any subdirectories within its scope:
+
+    cd myAppName
+
+## Enable platforms
+
+    cobalt platform add "iOS"
+    cobalt platform add "Android"
     
   
 ## Add Cobalt plugins
@@ -33,10 +42,8 @@ Using the -g flag installs the package globally, so it can be used in any projec
     cobalt plugins add ../myOwnPluginPath
     cobalt plugins remove "Plugin-Location"
   
-  
-  
-  
-  
+
 ## Add Cobalt to an existing iOS or Android app
     
+    cobalt ....
 
