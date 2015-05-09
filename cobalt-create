@@ -5,10 +5,14 @@ var config = require("./src/config");
 var log = require("./src/helpers/log");
 var Q = require('q');
 var fs = require('fs');
+var prompt = require('prompt');
 
-var commands = {};
+var commands = {
+    platforms: ['ios', 'android']
+};
 
-program.parse(process.argv);
+program
+    .parse(process.argv);
 
 /*
  First we check that cli args are ok
@@ -24,11 +28,24 @@ if (!program.args[1]) {
     log.error("your must specify a template name");
     process.exit(1);
 } else {
-    commands.templateName = program.args[0];
+    commands.templateName = program.args[1];
 }
 
+var askPlatforms = function () {
+    deferred = Q.defer();
+
+    prompt = require('sync-prompt').prompt;
+    ios = prompt('Would you like to create an iOS app y/n  (default: y)');
+    android = prompt('Would you like to create an Android app y/n  (default: y)');
+
+    if (ios == 'n') delete commands.platforms['ios'];
+    if (android == 'n') delete commands.platforms['android'];
+    deferred.resolve();
+    return deferred.promise;
+};
+
 var createPath = function () {
-    var deferred = Q.defer();
+    deferred = Q.defer();
     try {
         fs.mkdirSync(program.args[0]);
         deferred.resolve();
@@ -39,27 +56,56 @@ var createPath = function () {
     return deferred.promise;
 };
 
-var gitClone = function () {
+var gitCloneCobalt = function () {
     Repository = require('git-cli').Repository;
 
-    var deferred = Q.defer();
+    deferred = Q.defer();
 
-    Repository.clone(config.gitHub, commands.appName + '/' + 'cobalt_sources', function (err, repo) {
+    gitHubPath = config.gitHub + 'cobalt.git';
+    log.info("cloning " + gitHubPath);
+
+    Repository.clone(gitHubPath, commands.appName + '/' + 'cobalt_sources', function (err, repo) {
         if (err) {
-            deferred.reject("cannot clone the repository at " + config.gitHub);
+            deferred.reject("cannot clone the repository at " + gitHubPath);
         } else {
-            log.info("repository " + config.gitHub + " cloned");
+            log.info("repository " + gitHubPath + " cloned");
             deferred.resolve();
         }
     });
     return deferred.promise;
-}
+};
 
-createPath()
-    .then(gitClone)
+var gitCloneTemplate = function (platform) {
+    Repository = require('git-cli').Repository;
+
+    deferred = Q.defer();
+
+    gitHubPath = config.gitHub + commands.templateName + '-' + platform + '.git';
+    log.info("cloning " + gitHubPath);
+
+    Repository.clone(gitHubPath,
+        commands.appName + '/' + platform, function (err, repo) {
+            if (err) {
+                console.log(err)
+                deferred.reject("cannot clone the repository at " + gitHubPath);
+            } else {
+                log.info("repository " + gitHubPath + " cloned");
+                deferred.resolve();
+            }
+        });
+
+    return deferred.promise;
+};
+
+askPlatforms()
+    .then(createPath)
+    .then(gitCloneCobalt)
+    .then(function () {
+        commands.platforms.forEach(function (platform) {
+            return gitCloneTemplate(platform)
+        });
+    })
     .fail(function (err) {
         log.error(err);
         process.exit(1);
     });
-
-log.info("cloning " + config.gitHub);

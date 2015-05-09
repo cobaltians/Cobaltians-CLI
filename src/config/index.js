@@ -1,5 +1,5 @@
 var config = {
-    gitHub: "https://github.com/cobaltians/cobalt.git"
+    gitHub: "https://github.com/cobaltians/"
 };
 
 module.exports = config;
