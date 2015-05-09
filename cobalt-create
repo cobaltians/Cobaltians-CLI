@@ -6,7 +6,6 @@ var log = require("./src/helpers/log");
 var Q = require('q');
 require('q-foreach')(Q);
 var fs = require('fs');
-var prompt = require('prompt');
 
 var commands = {
     platforms: ['ios', 'android']
