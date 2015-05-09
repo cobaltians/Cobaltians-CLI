@@ -6,16 +6,25 @@ var log = require("./src/helpers/log");
 var Q = require('q');
 var fs = require('fs');
 
+var commands = {};
+
 program.parse(process.argv);
 
+/*
+ First we check that cli args are ok
+ */
 if (!program.args[0]) {
     log.error("Your must specify an app name");
     process.exit(1);
+} else {
+    commands.appName = program.args[0];
 }
 
 if (!program.args[1]) {
-    log.error("Your must specify a template name");
+    log.error("your must specify a template name");
     process.exit(1);
+} else {
+    commands.templateName = program.args[0];
 }
 
 var createPath = function () {
@@ -25,14 +34,32 @@ var createPath = function () {
         deferred.resolve();
     } catch (e) {
         //if (e.code != 'EEXIST')
-        deferred.reject("A folder already exists with the name " + program.args[0]);
+        deferred.reject("a folder already exists with the name " + program.args[0]);
     }
     return deferred.promise;
 };
 
+var gitClone = function () {
+    Repository = require('git-cli').Repository;
+
+    var deferred = Q.defer();
+
+    Repository.clone(config.gitHub, commands.appName + '/' + 'cobalt_sources', function (err, repo) {
+        if (err) {
+            deferred.reject("cannot clone the repository at " + config.gitHub);
+        } else {
+            log.info("repository " + config.gitHub + " cloned");
+            deferred.resolve();
+        }
+    });
+    return deferred.promise;
+}
+
 createPath()
+    .then(gitClone)
     .fail(function (err) {
         log.error(err);
+        process.exit(1);
     });
 
 log.info("cloning " + config.gitHub);
