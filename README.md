@@ -21,7 +21,7 @@ or
 This will create a MyApp directory and asks if you want to build the corresponding Android and iOS projects.
 All subsequent commands need to be run within the project's directory, or any subdirectories within its scope.
 
-    cd myAppName
+    cd myApp
 
   
 ## Add Cobalt plugins
