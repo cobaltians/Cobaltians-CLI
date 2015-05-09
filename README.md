@@ -1,8 +1,6 @@
 # cobalt-cli
 
-future is coming.
-
-
+Cobalt-CLI is a node.js command line to build Android and iOS Cobalt projects from an existing template.
 
 ## Cobalt CLI Installation
 
