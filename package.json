@@ -1,0 +1,25 @@
+{
+  "name": "cobalt-cli",
+  "version": "0.0.1",
+  "description": "Cobalt CLI is a command line tool to manage your cobalt project",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:cobaltians/cobalt-cli.git"
+  },
+  "keywords": [
+    "Cobalt"
+  ],
+  "author": "Baptiste Jamin <baptistjamin@gmail.com> (http://jamin.me/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cobaltians/cobalt-cli/issues"
+  },
+  "homepage": "https://github.com/cobaltians/cobalt-cli",
+  "dependencies": {
+    "commander": "2.8.1"
+  }
+}
