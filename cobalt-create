@@ -1,6 +1,38 @@
 #!/usr/bin/env node
 
 var program = require('commander');
+var config = require("./src/config");
+var log = require("./src/helpers/log");
+var Q = require('q');
+var fs = require('fs');
+
 program.parse(process.argv);
 
-console.log(program.args);
+if (!program.args[0]) {
+    log.error("Your must specify an app name");
+    process.exit(1);
+}
+
+if (!program.args[1]) {
+    log.error("Your must specify a template name");
+    process.exit(1);
+}
+
+var createPath = function () {
+    var deferred = Q.defer();
+    try {
+        fs.mkdirSync(program.args[0]);
+        deferred.resolve();
+    } catch (e) {
+        //if (e.code != 'EEXIST')
+        deferred.reject("A folder already exists with the name " + program.args[0]);
+    }
+    return deferred.promise;
+};
+
+createPath()
+    .fail(function (err) {
+        log.error(err);
+    });
+
+log.info("cloning " + config.gitHub);
