@@ -100,6 +100,9 @@ var renameTemplate = function (platform) {
 
     if (platform == 'ios') return rename.iosProject(commands.appName + '/' + platform, commands.templateName, commands.appName);
     if (platform == 'android') return rename.androidProject(commands.appName + '/' + platform, commands.templateName, commands.appName);
+
+    //TODO remove cobalt_sources
+
     deferred.resolve();
     return deferred.promise;
 };

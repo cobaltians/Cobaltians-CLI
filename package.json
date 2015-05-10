@@ -26,6 +26,7 @@
     "cli-color": "1.0.0",
     "git-cli": "0.8.2",
     "readline-sync": "1.2.14",
-    "replace": "0.3.0"
+    "replace": "0.3.0",
+    "fs-extra" : "0.18.3"
   }
 }

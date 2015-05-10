@@ -2,7 +2,7 @@
  * Created by baptistejamin on 09/05/15.
  */
 
-var fs = require('fs');
+var fs = require('fs-extra');
 
 module.exports.iosProject = function (path, templateName, appName) {
 
@@ -55,6 +55,16 @@ module.exports.iosProject = function (path, templateName, appName) {
             path + '/' + appName + 'Tests' + '/' + appName + 'Tests.m');
     } catch (e) {
     }
+
+    //copy appName/cobalt_sources/sources/iOS/Cobalt/Cobalt to appName/myAppTests/Cobalt
+    fs.copySync( appName + '/cobalt_sources/sources/iOS/Cobalt/Cobalt', path + '/Cobalt');
+
+    //copy cobalt.js and cobalt.min.js in the www/platform folder
+    fs.copySync( appName + '/cobalt_sources/distribution/web/iOS', path + '/www/platform');
+
+
+
+
 };
 
 module.exports.androidProject = function (path, templateName, appName) {
@@ -93,4 +103,11 @@ module.exports.androidProject = function (path, templateName, appName) {
         recursive: true,
         silent: true
     });
+
+    //copy appName/cobalt_sources/sources/iOS/Cobalt/Cobalt to appName/myAppTests/Cobalt
+    fs.copySync( appName + '/cobalt_sources/sources/Android/cobalt', path + '/cobalt');
+
+    //copy cobalt.js and cobalt.min.js in appName/myAppTests/src/main/assets/www folder
+    fs.copySync( appName + '/cobalt_sources/distribution/web/iOS', path +'/' + appName + '/src/main/assets/www/platform');
+
 };
