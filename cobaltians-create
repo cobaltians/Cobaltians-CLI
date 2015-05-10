@@ -4,10 +4,10 @@ var program = require('commander');
 var config = require("./src/config");
 var log = require("./src/helpers/log");
 var Q = require('q');
-var fs = require('fs');
+var fs = require('fs-extra');
 
 var commands = {
-    platforms: ['ios', 'android']
+    platforms: []
 };
 
 program
@@ -33,11 +33,13 @@ if (!program.args[1]) {
 var askPlatforms = function () {
     deferred = Q.defer();
     var readlineSync = require('readline-sync');
+
     ios = readlineSync.question('Would you like to create an iOS app y/n  (default: y): ');
     android = readlineSync.question('Would you like to create an Android app y/n  (default: y): ');
 
-    if (ios == 'n') delete commands.platforms['ios'];
-    if (android == 'n') delete commands.platforms['android'];
+    if (ios != 'n') commands.platforms.push('ios');
+    if (android != 'n') commands.platforms.push('android');
+    
     deferred.resolve();
     return deferred.promise;
 };
@@ -98,16 +100,27 @@ var renameTemplate = function (platform) {
     var rename = require('./src/helpers/rename');
     deferred = Q.defer();
 
+    log.info("making the template for " + platform);
+
     if (platform == 'ios') return rename.iosProject(commands.appName + '/' + platform, commands.templateName, commands.appName);
     if (platform == 'android') return rename.androidProject(commands.appName + '/' + platform, commands.templateName, commands.appName);
 
-    //TODO remove cobalt_sources
+    log.success(platform + ' template is done');
 
     deferred.resolve();
     return deferred.promise;
 };
 
-var promises = [];
+var removeSources = function () {
+    deferred = Q.defer();
+
+    log.info("Cleaning installation");
+
+    fs.removeSync(commands.appName + '/cobalt_sources');
+
+    deferred.resolve();
+    return deferred.promise;
+};
 
 askPlatforms()
     .then(createPath)
@@ -119,14 +132,15 @@ askPlatforms()
             });
         }, Q());
     })
-    .then(function(){
+    .then(function () {
         return commands.platforms.reduce(function (previous, job) {
             return previous.then(function () {
                 return renameTemplate(job);
             });
         }, Q());
     })
-    .then(function(){
+    .then(removeSources)
+    .then(function () {
         log.success("Finished");
     })
     .fail(function (err) {
