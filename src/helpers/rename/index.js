@@ -110,7 +110,8 @@ module.exports.androidProject = function (folder, templateName, appName) {
         path.normalize(folder + '/cobalt'));
 
     //copy cobalt.js and cobalt.min.js in appName/myAppTests/src/main/assets/www folder
-    fs.copySync(path.normalize(appName + '/cobalt_sources/distribution/web/iOS'),
-        path.normalize(folder + '/' + appName + '/src/main/assets/www/platform'));
+
+    fs.copySync(path.normalize(appName + '/cobalt_sources/distribution/web/Android'),
+        path.normalize(path + '/' + appName + '/src/main/assets/www/platform'));
 
 };
