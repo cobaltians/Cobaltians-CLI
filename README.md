@@ -33,6 +33,11 @@ All subsequent commands need to be run within the project's directory, or any su
 
 ## Add Cobalt to an existing iOS or Android app
 
+Move to the root folder of your iOS or Android project and type
     
-    cobaltians invade ;)
+    cobaltians invade
+
+This will ask you for :
+* the location where you want to move the Cobalt files
+* the location of your www folder to move the cobalt.js files in
 
