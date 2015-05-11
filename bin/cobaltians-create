@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 var program = require('commander');
-var config = require("./src/config");
-var log = require("./src/helpers/log");
+var config = require("./../src/config/index");
+var log = require("./../src/helpers/log/index");
 var Q = require('q');
 var fs = require('fs-extra');
 var path = require('path');
@@ -99,7 +99,7 @@ var gitCloneTemplate = function (platform) {
 };
 
 var renameTemplate = function (platform) {
-    var rename = require('./src/helpers/rename');
+    var rename = require('./../src/helpers/rename/index');
     deferred = Q.defer();
 
     log.info("making the template for " + platform);

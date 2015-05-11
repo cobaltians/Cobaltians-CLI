@@ -1,9 +1,12 @@
 {
   "name": "cobaltians",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "preferGlobal": "true",
   "description": "Cobaltians CLI is a command line tool to manage your cobalt project",
-  "main": "./cobaltians",
+  "main": "./bin/cobaltians",
+  "bin": {
+    "cobaltians": "bin/cobaltians"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,7 +15,9 @@
     "url": "git@github.com:cobaltians/cobaltians-cli.git"
   },
   "keywords": [
-    "Cobalt", "Hybrid", "Mobile"
+    "Cobalt",
+    "Hybrid",
+    "Mobile"
   ],
   "author": "Baptiste Jamin <baptistjamin@gmail.com> (http://jamin.me/)",
   "license": "MIT",
@@ -27,6 +32,6 @@
     "git-cli": "0.8.2",
     "readline-sync": "1.2.14",
     "replace": "0.3.0",
-    "fs-extra" : "0.18.3"
+    "fs-extra": "0.18.3"
   }
 }
