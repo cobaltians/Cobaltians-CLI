@@ -3,8 +3,9 @@
  */
 
 var fs = require('fs-extra');
+var path = require('path');
 
-module.exports.iosProject = function (path, templateName, appName) {
+module.exports.iosProject = function (folder, templateName, appName) {
 
     var replace = require("replace");
 
@@ -12,7 +13,7 @@ module.exports.iosProject = function (path, templateName, appName) {
     replace({
         regex: templateName,
         replacement: appName,
-        paths: [path],
+        paths: [path.normalize(folder)],
         recursive: true,
         silent: true
     });
@@ -20,54 +21,54 @@ module.exports.iosProject = function (path, templateName, appName) {
     replace({
         regex: "com." + templateName,
         replacement: "com." + appName,
-        paths: [path],
+        paths: [path.normalize(folder)],
         recursive: true,
         silent: true
     });
 
     //mv HelloWorld myApp
-    fs.renameSync(path + '/' + templateName + '/', path + '/' + appName + '/');
+    fs.renameSync(path.normalize(folder + '/' + templateName + '/'), path.normalize(folder + '/' + appName + '/'));
 
     //mv HelloWorld.xcodeproj myApp.xcodeproj
-    fs.renameSync(path + '/' + templateName + '.xcodeproj', path + '/' + appName + '.xcodeproj');
+    fs.renameSync(path.normalize(folder + '/' + templateName + '.xcodeproj'), path.normalize(folder + '/' + appName + '.xcodeproj'));
 
 
     //mv appName/HelloWorld/HelloWorld-Prefix.pch appName/appName/appName-Prefix.pch
-    fs.renameSync(path + '/' + appName + '/' + templateName + '-Prefix.pch', path + '/' + appName + '/' + appName + '-Prefix.pch');
+    fs.renameSync(path.normalize(folder + '/' + appName + '/' + templateName + '-Prefix.pch'),
+        path.normalize(folder + '/' + appName + '/' + appName + '-Prefix.pch'));
 
     //mv appName/HelloWorldTests appName/myAppTests
-    //fs.renameSync(path + '/' + templateName + 'Tests', path + '/' + appName + 'Tests');
+    //fs.renameSync(folder + '/' + templateName + 'Tests', folder + '/' + appName + 'Tests');
 
     try {
         //Catalog - Info.plist
-        fs.renameSync(path + '/' + appName + '/' + templateName + "-Info.plist", path + '/' + appName + '/' + appName + "-Info.plist");
+        fs.renameSync(path.normalize(folder + '/' + appName + '/' + templateName + "-Info.plist"),
+            path.normalize(folder + '/' + appName + '/' + appName + "-Info.plist"));
     } catch (e) {
     }
 
     try {
-        fs.renameSync(path + '/' + templateName + 'Tests', path + '/' + appName + 'Tests');
+        fs.renameSync(path.normalize(folder + '/' + templateName + 'Tests'), path.normalize(folder + '/' + appName + 'Tests'));
     } catch (e) {
     }
 
     try {
         //mv appName/myAppTests/HelloWorldTests.m appName/myAppTests/myAppTests.m
-        fs.renameSync(path + '/' + appName + 'Tests' + '/' + templateName + 'Tests.m',
-            path + '/' + appName + 'Tests' + '/' + appName + 'Tests.m');
+        fs.renameSync(path.normalize(folder + '/' + appName + 'Tests' + '/' + templateName + 'Tests.m'),
+            path.normalize(folder + '/' + appName + 'Tests' + '/' + appName + 'Tests.m'));
     } catch (e) {
     }
 
     //copy appName/cobalt_sources/sources/iOS/Cobalt/Cobalt to appName/myAppTests/Cobalt
-    fs.copySync( appName + '/cobalt_sources/sources/iOS/Cobalt/Cobalt', path + '/Cobalt');
+    fs.copySync(path.normalize(appName + '/cobalt_sources/sources/iOS/Cobalt/Cobalt'), path.normalize(folder + '/Cobalt'));
 
     //copy cobalt.js and cobalt.min.js in the www/platform folder
-    fs.copySync( appName + '/cobalt_sources/distribution/web/iOS', path + '/www/platform');
-
-
+    fs.copySync(path.normalize(appName + '/cobalt_sources/distribution/web/iOS'), path.normalize(folder + '/www/platform'));
 
 
 };
 
-module.exports.androidProject = function (path, templateName, appName) {
+module.exports.androidProject = function (folder, templateName, appName) {
 
     var replace = require("replace");
 
@@ -75,7 +76,7 @@ module.exports.androidProject = function (path, templateName, appName) {
     replace({
         regex: templateName,
         replacement: appName,
-        paths: [path],
+        paths: [path.normalize(folder)],
         recursive: true,
         silent: true
     });
@@ -83,31 +84,33 @@ module.exports.androidProject = function (path, templateName, appName) {
     replace({
         regex: "com.cobaltians." + templateName.toLowerCase(),
         replacement: "com." + appName.toLowerCase(),
-        paths: [path],
+        paths: [path.normalize(folder)],
         recursive: true,
         silent: true
     });
 
-    fs.renameSync(path + '/' + templateName, path + '/' + appName);
+    fs.renameSync(path.normalize(folder + '/' + templateName), path.normalize(folder + '/' + appName));
 
-    fs.renameSync(path + '/' + appName + '/src/main/java/com/cobaltians/' + templateName.toLowerCase(),
-        path + '/' + appName + '/src/main/java/com/' + appName.toLowerCase());
+    fs.renameSync(path.normalize(folder + '/' + appName + '/src/main/java/com/cobaltians/' + templateName.toLowerCase()),
+        path.normalize(folder + '/' + appName + '/src/main/java/com/' + appName.toLowerCase()));
 
-    fs.renameSync(path + '/' + appName + '/src/main/java/com/' + appName + '/' + templateName + 'Application.java',
-        path + '/' + appName + '/src/main/java/com/' + appName + 'Application.java');
+    fs.renameSync(folder + '/' + appName + '/src/main/java/com/' + appName + '/' + templateName + 'Application.java',
+        folder + '/' + appName + '/src/main/java/com/' + appName + 'Application.java');
 
     replace({
         regex: templateName + 'Application.java',
         replacement: appName + 'Application.java',
-        paths: [path],
+        paths: [path.normalize(folder)],
         recursive: true,
         silent: true
     });
 
     //copy appName/cobalt_sources/sources/iOS/Cobalt/Cobalt to appName/myAppTests/Cobalt
-    fs.copySync( appName + '/cobalt_sources/sources/Android/cobalt', path + '/cobalt');
+    fs.copySync(path.normalize(appName + '/cobalt_sources/sources/Android/cobalt'),
+        path.normalize(folder + '/cobalt'));
 
     //copy cobalt.js and cobalt.min.js in appName/myAppTests/src/main/assets/www folder
-    fs.copySync( appName + '/cobalt_sources/distribution/web/iOS', path +'/' + appName + '/src/main/assets/www/platform');
+    fs.copySync(path.normalize(appName + '/cobalt_sources/distribution/web/iOS'),
+        path.normalize(folder + '/' + appName + '/src/main/assets/www/platform'));
 
 };
