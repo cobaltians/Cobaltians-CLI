@@ -124,6 +124,22 @@ var removeSources = function () {
     return deferred.promise;
 };
 
+var cobaltiansFile = function () {
+    deferred = Q.defer();
+
+    log.info("Create cobaltians file");
+
+    fs.writeJsonSync(path.normalize(commands.appName + '/cobaltians.json'), {
+        name: commands.appName,
+        cobaltVersion: '0.4', //TODO: check how to get last cobalt version,
+        platforms: commands.platforms,
+        plugins: []
+    });
+
+    deferred.resolve();
+    return deferred.promise;
+};
+
 askPlatforms()
     .then(createPath)
     .then(gitCloneCobalt)
@@ -142,6 +158,7 @@ askPlatforms()
         }, Q());
     })
     .then(removeSources)
+    .then(cobaltiansFile)
     .then(function () {
         log.success("Finished");
     })
