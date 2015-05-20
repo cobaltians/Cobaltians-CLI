@@ -1,8 +1,8 @@
 {
   "name": "cobaltians",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "preferGlobal": "true",
-  "description": "Cobaltians CLI is a command line tool to manage your cobalt project",
+  "description": "Cobaltians CLI is a command line tool to manage your Cobalt project",
   "main": "./bin/cobaltians",
   "bin": {
     "cobaltians": "bin/cobaltians"
