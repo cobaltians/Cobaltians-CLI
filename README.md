@@ -2,6 +2,8 @@
 
 Cobalt-CLI is a node.js command line to build Android and iOS Cobalt projects from an existing template.
 
+More information on Cobalt can be found [here](http://cobaltians.com).
+
 ## Cobalt CLI Installation
 
     npm install cobaltians -g
@@ -18,26 +20,19 @@ or
     
     cobaltians create MyApp Catalog
     
-This will create a MyApp directory and asks if you want to build the corresponding Android and iOS projects.
-All subsequent commands need to be run within the project's directory, or any subdirectories within its scope.
+This will create a MyApp directory and asks if you want to build the corresponding Android and iOS projects inside.
 
-    cd myApp
+You can open your projects with XCode for iOS and Android Studio for Android.
 
-  
-## Add Cobalt plugins
+Be sure to have theses softwares installed and up-to-date SDK, JVM and build tools.
 
-    cobaltians plugins add "https://github.com/cobaltians/Plugin-Location.git"
-    cobaltians plugins add ../myOwnPluginPath
-    cobaltians plugins remove "Plugin-Location"
-  
+## What next ?
 
-## Add Cobalt to an existing iOS or Android app
 
-Move to the root folder of your iOS or Android project and type
-    
-    cobaltians invade
+In upcomming releases, this command line tool will be able to :
 
-This will ask you for :
-* the location where you want to move the Cobalt files
-* the location of your www folder to move the cobalt.js files in
+* Add and remove plugins 
+* Add and remove platforms 
+* Update itself and check for update automatically
+* Install Cobalt to an existing iOS or Android project.
 

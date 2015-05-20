@@ -86,7 +86,7 @@ var gitCloneTemplate = function (platform) {
     log.info("cloning " + gitHubPath);
 
     Repository.clone(gitHubPath,
-        path.normalize(commands.appName + '/' + platform), function (err, repo) {
+        path.normalize(commands.appName + '/' + platform + '/' + commands.appName), function (err, repo) {
             if (err) {
                 deferred.reject("cannot clone the repository at " + gitHubPath);
             } else {
@@ -104,8 +104,8 @@ var renameTemplate = function (platform) {
 
     log.info("making the template for " + platform);
 
-    if (platform == 'ios') return rename.iosProject(path.normalize(commands.appName + '/' + platform), commands.templateName, commands.appName);
-    if (platform == 'android') return rename.androidProject(path.normalize(commands.appName + '/' + platform), commands.templateName, commands.appName);
+    if (platform == 'ios') return rename.iosProject(path.normalize(commands.appName + '/' + platform + '/' + commands.appName), commands.templateName, commands.appName);
+    if (platform == 'android') return rename.androidProject(path.normalize(commands.appName + '/' + platform + '/' + commands.appName), commands.templateName, commands.appName);
 
     log.success(platform + ' template is done');
 
@@ -131,7 +131,7 @@ var cobaltiansFile = function () {
 
     fs.writeJsonSync(path.normalize(commands.appName + '/cobaltians.json'), {
         name: commands.appName,
-        cobaltVersion: '0.4', //TODO: check how to get last cobalt version,
+        cobaltVersion: '0.3', //TODO: check how to get last cobalt version,
         platforms: commands.platforms,
         plugins: []
     });
