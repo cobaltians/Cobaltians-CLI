@@ -1,10 +1,10 @@
 # cobaltians-cli
 
-Cobalt-CLI is a node.js command line to build Android and iOS Cobalt projects from an existing template.
+Cobaltians-CLI is a node.js command line to build Android and iOS Cobalt projects from an existing template.
 
 More information on Cobalt can be found [here](http://cobaltians.com).
 
-## Cobalt CLI Installation
+## Cobaltians CLI Installation
 
     npm install cobaltians -g
 
