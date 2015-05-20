@@ -71,6 +71,7 @@ var gitCloneCobalt = function () {
                 deferred.reject("cannot clone the repository at " + gitHubPath);
             } else {
                 log.success("repository " + gitHubPath + " cloned");
+                //TODO : move to selected branch with repo.showRemote if -b XXX is passed as arguments
                 deferred.resolve();
             }
         });
@@ -91,6 +92,7 @@ var gitCloneTemplate = function (platform) {
                 deferred.reject("cannot clone the repository at " + gitHubPath);
             } else {
                 log.success("repository " + gitHubPath + " cloned");
+                //TODO : move to selected branch with repo.showRemote if -b XXX is passed as arguments
                 deferred.resolve();
             }
         });
