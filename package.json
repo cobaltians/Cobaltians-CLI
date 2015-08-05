@@ -1,6 +1,6 @@
 {
   "name": "cobaltians",
-  "version": "0.0.6",
+  "version": "0.1.0",
   "preferGlobal": "true",
   "description": "Cobaltians CLI is a command line tool to manage your Cobalt project",
   "main": "./bin/cobaltians",
@@ -29,9 +29,10 @@
     "commander": "2.8.1",
     "q": "1.3.0",
     "cli-color": "1.0.0",
-    "git-cli": "0.8.2",
+    "nodegit": "0.4.1",
     "readline-sync": "1.2.14",
     "replace": "0.3.0",
-    "fs-extra": "0.18.3"
+    "fs-extra": "0.18.3",
+	"ini":"1.3.4"
   }
 }

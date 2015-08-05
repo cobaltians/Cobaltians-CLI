@@ -59,13 +59,6 @@ module.exports.iosProject = function (folder, templateName, appName) {
     } catch (e) {
     }
 
-    //copy appName/cobalt_sources/sources/iOS/Cobalt/Cobalt to appName/myAppTests/Cobalt
-    fs.copySync(path.normalize(appName + '/cobalt_sources/sources/iOS/Cobalt/Cobalt'), path.normalize(folder + '/Cobalt'));
-
-    //copy cobalt.js and cobalt.min.js in the www/platform folder
-    fs.copySync(path.normalize(appName + '/cobalt_sources/distribution/web/iOS'), path.normalize(folder + '/www/platform'));
-
-
 };
 
 module.exports.androidProject = function (folder, templateName, appName) {
@@ -104,14 +97,5 @@ module.exports.androidProject = function (folder, templateName, appName) {
         recursive: true,
         silent: true
     });
-
-    //copy appName/cobalt_sources/sources/iOS/Cobalt/Cobalt to appName/myAppTests/Cobalt
-    fs.copySync(path.normalize(appName + '/cobalt_sources/sources/Android/cobalt'),
-        path.normalize(folder + '/cobalt'));
-
-    //copy cobalt.js and cobalt.min.js in appName/myAppTests/src/main/assets/www folder
-
-    fs.copySync(path.normalize(appName + '/cobalt_sources/distribution/web/Android'),
-        path.normalize(folder + '/' + appName + '/src/main/assets/www/platform'));
 
 };

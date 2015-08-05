@@ -18,14 +18,14 @@ program
  First we check that cli args are ok
  */
 if (!program.args[0]) {
-    log.error("Your must specify an app name");
+    log.error("You must specify an app name");
     process.exit(1);
 } else {
     commands.appName = program.args[0];
 }
 
 if (!program.args[1]) {
-    log.error("your must specify a template name");
+    log.error("you must specify a template name");
     process.exit(1);
 } else {
     commands.templateName = program.args[1];
@@ -38,8 +38,8 @@ var askPlatforms = function () {
     ios = readlineSync.question('Would you like to create an iOS app y/n  (default: y): ');
     android = readlineSync.question('Would you like to create an Android app y/n  (default: y): ');
 
-    if (ios != 'n') commands.platforms.push('ios');
-    if (android != 'n') commands.platforms.push('android');
+    if (ios != 'n') commands.platforms.push('iOS');
+    if (android != 'n') commands.platforms.push('Android');
 
     deferred.resolve();
     return deferred.promise;
@@ -57,45 +57,94 @@ var createPath = function () {
     return deferred.promise;
 };
 
-var gitCloneCobalt = function () {
-    Repository = require('git-cli').Repository;
+var getSubmodules = function (localPath){
+    Ini = require('ini');
 
-    deferred = Q.defer();
-
-    gitHubPath = config.gitHub + 'cobalt.git';
-    log.info("cloning " + gitHubPath);
-
-    Repository.clone(gitHubPath,
-        path.normalize(commands.appName + '/' + 'cobalt_sources'), function (err, repo) {
-            if (err) {
-                deferred.reject("cannot clone the repository at " + gitHubPath);
-            } else {
-                log.success("repository " + gitHubPath + " cloned");
-                //TODO : move to selected branch with repo.showRemote if -b XXX is passed as arguments
-                deferred.resolve();
+    log.success("getting submodules for " + localPath);
+    modules = [];
+    try{
+        var config = Ini.parse(fs.readFileSync(path.normalize( localPath + '/.gitmodules'), 'utf-8'));
+        log.success("Fetching submodules from .gitmodules");
+        //if startswith submodule, push into modules
+        for (var i in config) {
+            if (i.indexOf('submodule') === 0){
+                module = config[i];
+                module.path = module.path.replace(/\/$/,'');
+                modules.push(module);
             }
-        });
-    return deferred.promise;
+        }
+    }catch(e){
+    }
+    return modules;
 };
 
-var gitCloneTemplate = function (platform) {
-    Repository = require('git-cli').Repository;
+var recursiveSubmoduleInit=function(localPath, repository){
+    //deferred = Q.defer();
+    Git = require('nodegit');
 
+    var modules = getSubmodules(localPath);
+    if (modules.length){
+
+        for (var i in modules) {
+            var modulePath = modules[i].path;
+
+            Git.Submodule.lookup(repository, modulePath).then(function(submodule) {
+                // Use submodule
+                log.success("got submodule '" + submodule.path() + "'");
+                try{
+                    submodule.init(1);
+                    log.success("submodule init worked");
+                }catch(e){
+                    log.error("submodule init failed "+ e);
+                }
+                try{
+                    submodule.update(1,new Git.CheckoutOptions);
+                    log.success("submodule update worked");
+                }catch(e){
+                    log.error("submodule update failed "+ e);
+                }
+            },function(err){
+                log.error('cant get submodule : '+err)
+            });
+            //recursiveSubmoduleInit( path.normalize(localPath + '/' + modulePath));
+        }
+    }
+};
+
+
+var gitCloneTemplate = function (platform) {
+    Git = require('nodegit');
     deferred = Q.defer();
 
-    gitHubPath = config.gitHub + 'Samples-' + commands.templateName + '-' + platform + '.git';
-    log.info("cloning " + gitHubPath);
+    gitHubUrl = config.github_samples + 'Samples-' + commands.templateName + '-' + platform + '.git';
+    localPath = path.normalize(commands.appName + '/' + platform + '/' + commands.appName);
+    cloneOptions = {}
+    cloneOptions = {
+        checkoutBranch : '0.4.1', //TODO : add branch depending on -b option
+        remoteCallbacks : {
+            certificateCheck: function() { return 1; }
+        }
+        /*checkoutOpts:{
+         checkoutStrategy : 5
+         }*/
+    }
 
-    Repository.clone(gitHubPath,
-        path.normalize(commands.appName + '/' + platform + '/' + commands.appName), function (err, repo) {
-            if (err) {
-                deferred.reject("cannot clone the repository at " + gitHubPath);
-            } else {
-                log.success("repository " + gitHubPath + " cloned");
-                //TODO : move to selected branch with repo.showRemote if -b XXX is passed as arguments
-                deferred.resolve();
-            }
-        });
+    log.info("Cloning " + gitHubUrl);
+
+
+    Git.Clone(gitHubUrl,localPath, cloneOptions)
+        .then(function(repository) {
+            log.success("repository " + gitHubUrl + " cloned");
+
+            recursiveSubmoduleInit(localPath, repository);
+
+
+            deferred.resolve();
+
+        }, function (reasonForFailure) {
+            deferred.reject("cannot clone the repository at " + gitHubUrl + " because " + reasonForFailure);
+        }
+    );
 
     return deferred.promise;
 };
@@ -106,21 +155,10 @@ var renameTemplate = function (platform) {
 
     log.info("making the template for " + platform);
 
-    if (platform == 'ios') return rename.iosProject(path.normalize(commands.appName + '/' + platform + '/' + commands.appName), commands.templateName, commands.appName);
-    if (platform == 'android') return rename.androidProject(path.normalize(commands.appName + '/' + platform + '/' + commands.appName), commands.templateName, commands.appName);
+    if (platform == 'iOS') return rename.iosProject(path.normalize(commands.appName + '/' + platform + '/' + commands.appName), commands.templateName, commands.appName);
+    if (platform == 'Android') return rename.androidProject(path.normalize(commands.appName + '/' + platform + '/' + commands.appName), commands.templateName, commands.appName);
 
     log.success(platform + ' template is done');
-
-    deferred.resolve();
-    return deferred.promise;
-};
-
-var removeSources = function () {
-    deferred = Q.defer();
-
-    log.info("Cleaning installation");
-
-    fs.removeSync(path.normalize(commands.appName + '/cobalt_sources'));
 
     deferred.resolve();
     return deferred.promise;
@@ -133,7 +171,7 @@ var cobaltiansFile = function () {
 
     fs.writeJsonSync(path.normalize(commands.appName + '/cobaltians.json'), {
         name: commands.appName,
-        cobaltVersion: '0.3', //TODO: check how to get last cobalt version,
+        cobaltVersion: '0.4.1', //TODO: check how to get last cobalt version,
         platforms: commands.platforms,
         plugins: []
     });
@@ -144,7 +182,6 @@ var cobaltiansFile = function () {
 
 askPlatforms()
     .then(createPath)
-    .then(gitCloneCobalt)
     .then(function () {
         return commands.platforms.reduce(function (previous, job) {
             return previous.then(function () {
@@ -159,7 +196,6 @@ askPlatforms()
             });
         }, Q());
     })
-    .then(removeSources)
     .then(cobaltiansFile)
     .then(function () {
         log.success("Finished");
