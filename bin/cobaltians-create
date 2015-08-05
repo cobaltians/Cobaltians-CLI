@@ -76,40 +76,49 @@ var getSubmodules = function (localPath){
             }
         }
     }catch(e){
+        log.error('cant get submodules: '+ e)
     }
     return modules;
 };
 
 var initSubmodules=function(localPath, repository){
-    //deferred = Q.defer();
+    deferred = Q.defer();
     Git = require('nodegit');
 
     var modules = getSubmodules(localPath);
     if (modules.length){
+        i=0;
+        return modules.reduce(function (previous, module) {
+            return previous.then(function(){
+                var modulePath = modules[i].path;
+                i++;
 
-        for (var i in modules) {
-            var modulePath = modules[i].path;
+                return Git.Submodule.lookup(repository, modulePath).then(function(submodule) {
+                    log.success("got submodule '" + submodule.path() + "'");
+                    try{
+                        submodule.init(1);
+                        log.success("submodule init worked");
+                    }catch(e){
+                        log.error("submodule init failed "+ e);
+                    }
+                    try{
+                        submodule.update(1,new Git.CheckoutOptions);
+                        log.success("submodule update worked");
+                    }catch(e){
+                        log.error("submodule update failed "+ e);
+                    }
+                    deferred.resolve();
+                    return deferred.promise;
 
-            Git.Submodule.lookup(repository, modulePath).then(function(submodule) {
-                // Use submodule
-                log.success("got submodule '" + submodule.path() + "'");
-                try{
-                    submodule.init(1);
-                    log.success("submodule init worked");
-                }catch(e){
-                    log.error("submodule init failed "+ e);
-                }
-                try{
-                    submodule.update(1,new Git.CheckoutOptions);
-                    log.success("submodule update worked");
-                }catch(e){
-                    log.error("submodule update failed "+ e);
-                }
-            },function(err){
-                log.error('cant get submodule : '+err)
+                },function(err){
+                    log.error('cant get submodule : '+err)
+                    deferred.resolve();
+                    return deferred.promise;
+                });
             });
-        }
+        }, Q());
     }
+    return deferred.promise;
 };
 
 
@@ -132,21 +141,23 @@ var gitCloneTemplate = function (platform) {
         cloneOptions.checkoutBranch=commands.branch;
     }
 
-    Git.Clone(gitHubUrl,localPath, cloneOptions)
+    return Git.Clone(gitHubUrl,localPath, cloneOptions)
         .then(function(repository) {
             log.success("repository " + gitHubUrl + " cloned");
 
-            initSubmodules(localPath, repository);
-
-
-            deferred.resolve();
+            return initSubmodules(localPath, repository).then(function(repository) {
+                log.success('submodule init ended');
+                deferred.resolve();
+                return deferred.promise;
+            },function(){
+                deferred.reject();
+                return deferred.promise;
+            });
 
         }, function (reasonForFailure) {
-            deferred.reject("cannot clone the repository at " + gitHubUrl + " because " + reasonForFailure);
+            return deferred.reject("cannot clone the repository at " + gitHubUrl + " because " + reasonForFailure);
         }
     );
-
-    return deferred.promise;
 };
 
 var renameTemplate = function (platform) {
