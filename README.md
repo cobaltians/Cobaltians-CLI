@@ -26,6 +26,13 @@ You can open your projects with XCode for iOS and Android Studio for Android.
 
 Be sure to have theses softwares installed and up-to-date SDK, JVM and build tools.
 
+### Choosing a template branch
+
+You can use a fourth argument to the command line to select the branch of the template you want to use.
+
+    cobaltians create MyApp Catalog 0.4.1
+    
+
 ## What next ?
 
 
