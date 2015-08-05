@@ -76,7 +76,7 @@ var getSubmodules = function (localPath){
             }
         }
     }catch(e){
-        log.error('cant get submodules: '+ e)
+        log.info('cant get submodules')
     }
     return modules;
 };
@@ -117,6 +117,8 @@ var initSubmodules=function(localPath, repository){
                 });
             });
         }, Q());
+    }else{
+        deferred.resolve();
     }
     return deferred.promise;
 };
