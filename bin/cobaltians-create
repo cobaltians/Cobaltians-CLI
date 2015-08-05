@@ -31,6 +31,10 @@ if (!program.args[1]) {
     commands.templateName = program.args[1];
 }
 
+if (program.args[2]) {
+    commands.branch = program.args[2];
+}
+
 var askPlatforms = function () {
     deferred = Q.defer();
     var readlineSync = require('readline-sync');
@@ -118,19 +122,18 @@ var gitCloneTemplate = function (platform) {
 
     gitHubUrl = config.github_samples + 'Samples-' + commands.templateName + '-' + platform + '.git';
     localPath = path.normalize(commands.appName + '/' + platform + '/' + commands.appName);
-    cloneOptions = {}
     cloneOptions = {
-        checkoutBranch : '0.4.1', //TODO : add branch depending on -b option
+        //for mac certificates bug. see nodegit guides.
         remoteCallbacks : {
             certificateCheck: function() { return 1; }
         }
-        /*checkoutOpts:{
-         checkoutStrategy : 5
-         }*/
-    }
-
+    };
     log.info("Cloning " + gitHubUrl);
 
+    if (commands.branch){
+        log.info("Using branch " + commands.branch);
+        cloneOptions.checkoutBranch=commands.branch;
+    }
 
     Git.Clone(gitHubUrl,localPath, cloneOptions)
         .then(function(repository) {
