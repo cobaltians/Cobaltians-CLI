@@ -32,6 +32,8 @@ module.exports.iosProject = function (folder, templateName, appName) {
     //mv HelloWorld.xcodeproj myApp.xcodeproj
     fs.renameSync(path.normalize(folder + '/' + templateName + '.xcodeproj'), path.normalize(folder + '/' + appName + '.xcodeproj'));
 
+    //mv HelloWorld.xcworkspace myApp.xcworkspace
+    fs.renameSync(path.normalize(folder + '/' + templateName + '.xcworkspace'), path.normalize(folder + '/' + appName + '.xcworkspace'));
 
     //mv appName/HelloWorld/HelloWorld-Prefix.pch appName/appName/appName-Prefix.pch
     fs.renameSync(path.normalize(folder + '/' + appName + '/' + templateName + '-Prefix.pch'),
