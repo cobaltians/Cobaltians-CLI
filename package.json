@@ -1,6 +1,6 @@
 {
   "name": "cobaltians",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "preferGlobal": "true",
   "description": "Cobaltians CLI is a command line tool to manage your Cobalt project",
   "main": "./bin/cobaltians",
@@ -20,6 +20,9 @@
     "Mobile"
   ],
   "author": "Baptiste Jamin <baptistjamin@gmail.com> (http://jamin.me/)",
+  "contributors": [
+    "Guillaume Gendre <dzb.rtz@gmail.com> (http://ggendre.tumblr.com)"
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/cobaltians/cobaltians-cli/issues"

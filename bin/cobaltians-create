@@ -49,14 +49,15 @@ var askPlatforms = function () {
     return deferred.promise;
 };
 
-var createPath = function () {
+var createPath = function (newpath) {
     deferred = Q.defer();
     try {
-        fs.mkdirSync(path.normalize(program.args[0]));
+        log.info('creating path '+ newpath);
+        fs.mkdirSync(path.normalize(newpath));
         deferred.resolve();
     } catch (e) {
         //if (e.code != 'EEXIST')
-        deferred.reject("a folder already exists with the name " + program.args[0]);
+        deferred.reject("a folder already exists with the name " + newpath);
     }
     return deferred.promise;
 };
@@ -136,14 +137,16 @@ var gitCloneTemplate = function (platform) {
             certificateCheck: function() { return 1; }
         }
     };
-    log.info("Cloning " + gitHubUrl);
 
-    if (commands.branch){
-        log.info("Using branch " + commands.branch);
-        cloneOptions.checkoutBranch=commands.branch;
-    }
-
-    return Git.Clone(gitHubUrl,localPath, cloneOptions)
+    return createPath(path.normalize(commands.appName + '/' + platform))
+        .then(function(){
+            log.info("Cloning " + gitHubUrl);
+            if (commands.branch){
+                log.info("Using branch " + commands.branch);
+                cloneOptions.checkoutBranch=commands.branch;
+            }
+            return Git.Clone(gitHubUrl, localPath, cloneOptions)
+        })
         .then(function(repository) {
             log.success("repository " + gitHubUrl + " cloned");
 
@@ -158,8 +161,9 @@ var gitCloneTemplate = function (platform) {
 
         }, function (reasonForFailure) {
             return deferred.reject("cannot clone the repository at " + gitHubUrl + " because " + reasonForFailure);
-        }
-    );
+        });
+
+
 };
 
 var renameTemplate = function (platform) {
@@ -194,7 +198,10 @@ var cobaltiansFile = function () {
 };
 
 askPlatforms()
-    .then(createPath)
+    .then(function () {
+        //create myApp path.
+        return createPath(program.args[0]);
+    })
     .then(function () {
         return commands.platforms.reduce(function (previous, job) {
             return previous.then(function () {
