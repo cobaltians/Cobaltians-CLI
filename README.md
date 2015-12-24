@@ -12,15 +12,15 @@ Using the -g flag installs the package globally, so it can be used in any projec
 
 ## Create project from the command line
 
-Choose an app name and a base template
+3) Create your app from a sample
 
-    cobaltians create MyApp HelloWorld
+Choose a name and a base sample to create your first app :
 
-or
-    
-    cobaltians create MyApp Catalog
-    
-This will create a MyApp directory and asks if you want to build the corresponding Android and iOS projects inside.
+    cobaltians create myApp HelloWorld
+
+This will create a "myApp" folder and ask if you want to create the corresponding iOS and Android projects.
+
+Available samples are for example "HelloWorld" or "Catalog". Read more about them [here](https://github.com/cobaltians/cobalt/wiki/Samples-list).
 
 You can open your projects with XCode for iOS and Android Studio for Android.
 
