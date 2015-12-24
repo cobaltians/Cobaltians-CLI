@@ -38,6 +38,20 @@ module.exports.iosProject = function (folder, templateName, appName) {
     } catch (e) {
     }
 
+    //mv appName/HelloWorld/HelloWorldViewController.m appName/appName/appNameViewController.m
+    //mv appName/HelloWorld/HelloWorldViewController.h appName/appName/appNameViewController.h
+    try {
+        fs.renameSync(path.normalize(folder + '/' + appName + '/' + templateName + 'ViewController.m'),
+          path.normalize(folder + '/' + appName + '/' + appName + 'ViewController.m'));
+    } catch (e) {
+    }
+    try {
+        fs.renameSync(path.normalize(folder + '/' + appName + '/' + templateName + 'ViewController.h'),
+          path.normalize(folder + '/' + appName + '/' + appName + 'ViewController.h'));
+    } catch (e) {
+    }
+
+
     //mv appName/HelloWorld/HelloWorld-Prefix.pch appName/appName/appName-Prefix.pch
     try {
         fs.renameSync(path.normalize(folder + '/' + appName + '/' + templateName + '-Prefix.pch'),
