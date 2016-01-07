@@ -5,6 +5,26 @@
 var fs = require('fs-extra');
 var path = require('path');
 
+function renameFilesRecursively(dir, oldString, newString) {
+    var files = fs.readdirSync(dir),
+      f,
+      fileName,
+      path,
+      newPath,
+      file;
+
+    for (f = 0; f < files.length; f += 1) {
+        fileName = files[f];
+        path = dir + '/' + fileName;
+        file = fs.statSync(path);
+        newPath = path.replace(oldString, newString);
+        fs.renameSync(path, newPath);
+        if (file.isDirectory()) {
+            renameFilesRecursively(newPath, oldString, newString);
+        }
+    }
+}
+
 module.exports.iosProject = function (folder, templateName, appName) {
 
     var replace = require("replace");
@@ -80,13 +100,18 @@ module.exports.iosProject = function (folder, templateName, appName) {
     } catch (e) {
     }
 
+
 };
 
 module.exports.androidProject = function (folder, templateName, appName) {
 
     var replace = require("replace");
 
-    //First, let's replace occurences in files
+    //first rename all folders and files
+    renameFilesRecursively(folder, templateName, appName);
+    renameFilesRecursively(folder, templateName.toLowerCase(), appName.toLowerCase());
+
+    //then replace occurences in files
     replace({
         regex: templateName,
         replacement: appName,
@@ -96,24 +121,8 @@ module.exports.androidProject = function (folder, templateName, appName) {
     });
 
     replace({
-        regex: "com.cobaltians." + templateName.toLowerCase(),
-        replacement: "com." + appName.toLowerCase(),
-        paths: [path.normalize(folder)],
-        recursive: true,
-        silent: true
-    });
-
-    fs.renameSync(path.normalize(folder + '/' + templateName), path.normalize(folder + '/' + appName));
-
-    fs.renameSync(path.normalize(folder + '/' + appName + '/src/main/java/com/cobaltians/' + templateName.toLowerCase()),
-        path.normalize(folder + '/' + appName + '/src/main/java/com/' + appName.toLowerCase()));
-
-    fs.renameSync(folder + '/' + appName + '/src/main/java/com/' + appName + '/' + templateName + 'Application.java',
-        folder + '/' + appName + '/src/main/java/com/' + appName + 'Application.java');
-
-    replace({
-        regex: templateName + 'Application.java',
-        replacement: appName + 'Application.java',
+        regex: templateName.toLowerCase(),
+        replacement: appName.toLowerCase(),
         paths: [path.normalize(folder)],
         recursive: true,
         silent: true
