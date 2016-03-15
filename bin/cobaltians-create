@@ -144,6 +144,9 @@ var gitCloneTemplate = function (platform) {
             if (commands.branch){
                 log.info("Using branch " + commands.branch);
                 cloneOptions.checkoutBranch=commands.branch;
+            }else{
+                log.info("Using branch master");
+                cloneOptions.checkoutBranch='master';
             }
             return Git.Clone(gitHubUrl, localPath, cloneOptions)
         })
@@ -188,7 +191,7 @@ var cobaltiansFile = function () {
 
     fs.writeJsonSync(path.normalize(commands.appName + '/cobaltians.json'), {
         name: commands.appName,
-        cobaltVersion: '0.4.1', //TODO: check how to get last cobalt version,
+        cobaltVersion: '0.5.0', //TODO: check how to get last cobalt version,
         platforms: commands.platforms,
         plugins: []
     });

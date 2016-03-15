@@ -30,7 +30,7 @@ Be sure to have theses softwares installed and up-to-date SDK, JVM and build too
 
 You can use a fourth argument to the command line to select the branch of the template you want to use.
 
-    cobaltians create MyApp Catalog 0.4.1
+    cobaltians create MyApp Catalog develop
     
 
 ## What next ?
