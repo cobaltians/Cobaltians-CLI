@@ -65,19 +65,33 @@ var createPath = function (newpath) {
 var getSubmodules = function (localPath){
     Ini = require('ini');
 
-    log.success("getting submodules for " + localPath);
+    log.info("Fetching submodules for " + localPath);
     modules = [];
-    try{
-        var config = Ini.parse(fs.readFileSync(path.normalize( localPath + '/.gitmodules'), 'utf-8'));
-        log.success("Fetching submodules from .gitmodules");
-        //if startswith submodule, push into modules
+
+    try {
+        var gitmodulesPath = path.normalize(localPath + '/.gitmodules');
+        var configString = fs.readFileSync(gitmodulesPath, 'utf-8');
+
+        // Fix .gitmodules: replace SSH and HTTPS by GIT URIs
+        var fixedConfigString = configString.replace(/git@github\.com:/g, 'git://github.com/');
+        fixedConfigString = fixedConfigString.replace(/https:\/\/github\.com:/g, 'git://github.com/');
+
+        if (fixedConfigString != configString) {
+            fs.writeFileSync(gitmodulesPath, fixedConfigString);
+            log.warning('Invalid submodules URIs fixed in .gitmodules, this should be corrected in the samples repository');
+        }
+
+        var config = Ini.parse(fixedConfigString);
+
         for (var i in config) {
             if (i.indexOf('submodule') === 0){
                 modules.push(config[i]);
             }
         }
-    }catch(e){
-        log.info('cant get submodules')
+
+        log.success(modules.length + ' modules found')
+    } catch(e) {
+        log.error('Cant get submodules: ' + e)
     }
     return modules;
 };
