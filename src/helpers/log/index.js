@@ -11,3 +11,7 @@ module.exports.info = function(args){
 module.exports.success = function(args){
     console.log(clc.green("Success"), args);
 }
+
+module.exports.warning = function(args){
+    console.log(clc.redBright("Warning"), args);
+}
