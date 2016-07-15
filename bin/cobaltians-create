@@ -62,126 +62,26 @@ var createPath = function (newpath) {
     return deferred.promise;
 };
 
-var getSubmodules = function (localPath){
-    Ini = require('ini');
-
-    log.info("Fetching submodules for " + localPath);
-    modules = [];
-
-    try {
-        var gitmodulesPath = path.normalize(localPath + '/.gitmodules');
-        var configString = fs.readFileSync(gitmodulesPath, 'utf-8');
-
-        // Fix .gitmodules: replace SSH and HTTPS by GIT URIs
-        var fixedConfigString = configString.replace(/git@github\.com:/g, 'git://github.com/');
-        fixedConfigString = fixedConfigString.replace(/https:\/\/github\.com:/g, 'git://github.com/');
-
-        if (fixedConfigString != configString) {
-            fs.writeFileSync(gitmodulesPath, fixedConfigString);
-            log.warning('Invalid submodules URIs fixed in .gitmodules, this should be corrected in the samples repository');
-        }
-
-        var config = Ini.parse(fixedConfigString);
-
-        for (var i in config) {
-            if (i.indexOf('submodule') === 0){
-                modules.push(config[i]);
-            }
-        }
-
-        log.success(modules.length + ' modules found')
-    } catch(e) {
-        log.error('Cant get submodules: ' + e)
-    }
-    return modules;
-};
-
-var initSubmodules = function(localPath, repository){
-    deferred = Q.defer();
-    Git = require('nodegit');
-
-    var modules = getSubmodules(localPath);
-    if (modules.length) {
-        log.info(modules.length + ' modules will now be cloned')
-        var i = 1;
-        return modules.reduce(function (previous, module) {
-            return previous.then(function() {
-                var modulePath = module.path;
-                log.info('[' + i + '/' + modules.length + "] Module '" + modulePath + "'");
-                i++;
-
-                return Git.Submodule.lookup(repository, modulePath).then(function (submodule) {
-                    log.success('Submodule path found');
-
-                    if (submodule.init(1) == 0) {
-                        log.success("Submodule init worked");
-
-                        if (submodule.update(1, new Git.SubmoduleUpdateOptions) == 0)
-                            log.success("Submodule update worked");
-                        else
-                            log.error('Submodule update failed: ' + Git.Giterr.errLast().message());
-                    } else
-                        log.error('Submodule init failed: ' + Git.Giterr.errLast().message());
-
-                    deferred.resolve();
-                    return deferred.promise;
-
-                }, function(err) {
-                    log.error(err);
-                    deferred.resolve();
-                    return deferred.promise;
-                });
-            });
-        }, Q());
-    }else{
-        deferred.resolve();
-    }
-    return deferred.promise;
-};
-
-
 var gitCloneTemplate = function (platform) {
-    Git = require('nodegit');
+    Git = require('simple-git')();
     deferred = Q.defer();
 
     gitHubUrl = config.github_samples + 'Samples-' + commands.templateName + '-' + platform + '.git';
     localPath = path.normalize(commands.appName + '/' + platform + '/' + commands.appName);
-    cloneOptions = {
-        //for mac certificates bug. see nodegit guides.
-        remoteCallbacks : {
-            certificateCheck: function() { return 1; }
-        }
-    };
+    branch = commands.branch || 'master'; //TODO doesn't work
+    options = ['--recursive', '-b', branch];
 
     return createPath(path.normalize(commands.appName + '/' + platform))
         .then(function(){
-            log.info("Cloning " + gitHubUrl);
-            if (commands.branch){
-                log.info("Using branch " + commands.branch);
-                cloneOptions.checkoutBranch=commands.branch;
-            }else{
-                log.info("Using branch master");
-                cloneOptions.checkoutBranch='master';
-            }
-            return Git.Clone(gitHubUrl, localPath, cloneOptions)
+            log.info("Cloning " + gitHubUrl + " using branch " + commands.branch);
+
+            return Git.clone(gitHubUrl, localPath, options);
         })
         .then(function(repository) {
             log.success("repository " + gitHubUrl + " cloned");
-
-            return initSubmodules(localPath, repository).then(function(repository) {
-                log.success('submodule init ended');
-                deferred.resolve();
-                return deferred.promise;
-            },function(){
-                deferred.reject();
-                return deferred.promise;
-            });
-
         }, function (reasonForFailure) {
             return deferred.reject("cannot clone the repository at " + gitHubUrl + " because " + reasonForFailure);
         });
-
-
 };
 
 var renameTemplate = function (platform) {
