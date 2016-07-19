@@ -71,7 +71,11 @@ var askPlatforms = function () {
     if (ios != 'n') commands.platforms.push('iOS');
     if (android != 'n') commands.platforms.push('Android');
 
-    deferred.resolve();
+    if (commands.platforms.length) {
+        deferred.resolve();
+    } else {
+        deferred.reject('Cancelled');
+    }
     return deferred.promise;
 };
 
