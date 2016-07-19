@@ -161,6 +161,7 @@ askPlatforms()
         return commands.platforms.reduce(function (previous, job) {
             return previous.then(function () {
                 return gitCloneTemplate(job);
+                //TODO : if user said no to overwrite : CLI fails
             });
         }, Q());
     })
