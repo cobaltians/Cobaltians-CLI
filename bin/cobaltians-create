@@ -6,6 +6,10 @@ var log = require("./../src/helpers/log/index");
 var Q = require('q');
 var fs = require('fs-extra');
 var path = require('path');
+var readlineSync = require('readline-sync');
+
+var known_templates = ['HelloWorld', 'Catalog', 'SideMenu'];
+var appNameRegexp = /^[a-zA-Z0-9\-]+$/;
 
 var commands = {
     platforms: []
@@ -17,27 +21,49 @@ program
 /*
  First we check that cli args are ok
  */
-if (!program.args[0]) {
-    log.error("You must specify an app name");
+
+var dieWithAppNameError = function(){
+    log.error("you must specify a valide app name.\n" +
+      "App name must not contain spaces or special chars.\n" +
+      "It should match regexp format "+appNameRegexp);
     process.exit(1);
+};
+
+
+var dieWithTemplateNameError = function(){
+    log.error("you must specify a known template name.\n" +
+      "Known template names are : " + known_templates.join(', '));
+    process.exit(1);
+};
+
+
+
+if (!program.args[0]) {
+    dieWithAppNameError();
 } else {
     commands.appName = program.args[0];
+    if (!commands.appName.match(appNameRegexp)) {
+        dieWithAppNameError();
+    }
 }
 
 if (!program.args[1]) {
-    log.error("you must specify a template name");
-    process.exit(1);
+    dieWithTemplateNameError();
 } else {
     commands.templateName = program.args[1];
+    if (known_templates.indexOf(commands.templateName) === -1) {
+        dieWithTemplateNameError();
+    }
 }
 
 if (program.args[2]) {
     commands.branch = program.args[2];
+} else {
+    commands.branch = "master";
 }
 
 var askPlatforms = function () {
     deferred = Q.defer();
-    var readlineSync = require('readline-sync');
 
     ios = readlineSync.question('Would you like to create an iOS app y/n  (default: y): ');
     android = readlineSync.question('Would you like to create an Android app y/n  (default: y): ');
@@ -49,7 +75,7 @@ var askPlatforms = function () {
     return deferred.promise;
 };
 
-var createPath = function (newpath) {
+var createPath = function (newpath, eraseContent) {
     deferred = Q.defer();
     try {
         log.info('creating path '+ newpath);
@@ -57,7 +83,15 @@ var createPath = function (newpath) {
         deferred.resolve();
     } catch (e) {
         //if (e.code != 'EEXIST')
-        deferred.reject("a folder already exists with the name " + newpath);
+        var question = 'A "'+newpath+'" folder already exists. ' + (eraseContent ?  'Erase content and continue' : 'Continue') + ' ? y/n  (default: y): ';
+        if (readlineSync.question(question) !== 'n') {
+            if (eraseContent){
+                fs.emptyDirSync(newpath)
+            }
+            deferred.resolve();
+        } else {
+            deferred.reject("Canceled");
+        }
     }
     return deferred.promise;
 };
@@ -68,10 +102,9 @@ var gitCloneTemplate = function (platform) {
 
     gitHubUrl = config.github_samples + 'Samples-' + commands.templateName + '-' + platform + '.git';
     localPath = path.normalize(commands.appName + '/' + platform + '/' + commands.appName);
-    branch = commands.branch || 'master'; //TODO doesn't work
-    options = ['--recursive', '-b', branch];
+    options = ['--recursive', '-b', commands.branch];
 
-    return createPath(path.normalize(commands.appName + '/' + platform))
+    return createPath(path.normalize(commands.appName + '/' + platform), true)
         .then(function(){
             log.info("Cloning " + gitHubUrl + " using branch " + commands.branch);
 
